@@ -13206,7 +13206,7 @@ a.read_more i {
 .nft_wrap {
   position: relative;
   width: 100%;
-  height: 200px;
+  height: auto;
   overflow: hidden;
   border-radius: 10px 10px 0 0;
   -moz-border-radius: 10px 10px 0 0;
@@ -16672,15 +16672,10 @@ img {
     rgba(255, 255, 255, 0.5) 60%,
     rgba(255, 255, 255, 0)
   );
-  -webkit-animation: shimmer 2s infinite;
   animation: shimmer 2s infinite;
   content: "";
 }
-@-webkit-keyframes shimmer {
-  100% {
-    transform: translateX(100%);
-  }
-}
+
 @keyframes shimmer {
   100% {
     transform: translateX(100%);
@@ -16713,4 +16708,44 @@ img {
 
 .no-cursor {
   cursor: not-allowed;
+}
+
+/* Slider Carousel */
+
+.slick-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  cursor: pointer;
+}
+
+.slick-prev {
+  left: 1% !important; /* Adjust positioning to move it outside the slider */
+  top: 46% !important;
+}
+
+.slick-next {
+  right: 23px !important; /* Adjust positioning to move it outside the slider */
+  top: 46% !important;
+}
+
+.slick-arrow i {
+  font-size: 24px; /* Adjust the size of the arrow icons */
+  color: #8365E2; /* Change the color of the icons */
+  background-color: white; /* Background for the icons */
+  border: solid 1px #DDDDDD;
+  padding: 10px;
+  border-radius: 50%;
+}
+
+.slick-arrow:hover i {
+  transform: scale(1.2); /* Darken on hover */
+  transition: transform 0.3s ease;
+  box-shadow: #dddddd 0px 0px 20px;
+}
+
+.slick-next:before,
+.slick-prev:before {
+  display: none;
 }
