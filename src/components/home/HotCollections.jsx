@@ -26,7 +26,7 @@ const HotCollections = () => {
   const settings = {
     dots: true,
     infinite: true,
-    speed: 2000,
+    speed: 500,
     autoplaySpeed: 10000,
     slidesToShow: 4,
     slidesToScroll: 1,
