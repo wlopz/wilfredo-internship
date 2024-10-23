@@ -104,11 +104,15 @@ const NewItems = () => {
                       </div>
 
                       <div className="nft__item_wrap">
-                        <Skeleton width="160px" height="250px" borderRadius="5px" />
+                        <Skeleton width="160px" height="250px" borderRadius="5px" top="28px" />
                       </div>
 
                       <div className="nft__item_info">
                         <Skeleton width="80px" height="20px" borderRadius="5px" />
+                        <div>
+                          <Skeleton width="45px" height="20px" borderRadius="5px" />
+                          <Skeleton width="33px" height="20px" borderRadius="5px" left="95px" />
+                        </div>
                       </div>
                     </div>
                   </div>
