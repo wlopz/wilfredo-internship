@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
+import Skeleton from "../UI/Skeleton";
 
 const ExploreItems = () => {
+  // State to track whether the API data is being fetched
+  const [loading, setLoading] = useState(true);
+
   // State to hold filtered items from the API
   const [exploreItemsFilter, setExploreItemsFilter] = useState([]);
 
@@ -23,6 +27,9 @@ const ExploreItems = () => {
       `https://us-central1-nft-cloud-functions.cloudfunctions.net/explore?filter=${filter}`
     );
 
+    // Stop loading after fetching data
+    setLoading(false);
+
     // Save the filtered items in state
     setExploreItemsFilter(data);
 
@@ -41,8 +48,10 @@ const ExploreItems = () => {
   const handleFilterChange = (value) => {
     // Update the URL with the new filter value
     if (value === "price_low_to_high" || value === "price_high_to_low" || value === "likes_high_to_low") {
+      setLoading(true);
       navigate(`?filter=${value}`, { replace: true });
     } else if (value === "") {
+      setLoading(true);
       navigate(``, { replace: false });
     }
     
@@ -123,7 +132,32 @@ const ExploreItems = () => {
       </div>
 
       {/* Render the list of displayed data */}
-      {displayedData.map((exploreItem) => (
+      {loading
+        ? new Array(8).fill(0).map((_, index) => (
+            <div className="col-lg-3 col-md-6 col-sm-12 col-xs-12" key={index}>
+              <div className="nft__item">
+                <div className="author_list_pp">
+                  <Skeleton width="60px" height="60px" borderRadius="50px" />
+                </div>
+                <div className="de_countdown" style={{ right: 6, border: "none" }}>
+                  <Skeleton width="80px" height="20px" borderRadius="5px" />
+                </div>
+
+                <div className="nft__item_wrap">
+                  <Skeleton width="200px" height="250px" borderRadius="5px" top="28px" />
+                </div>
+
+                <div className="nft__item_info">
+                  <Skeleton width="80px" height="20px" borderRadius="5px" />
+                  <div>
+                    <Skeleton width="45px" height="20px" borderRadius="5px" />
+                    <Skeleton width="33px" height="20px" borderRadius="5px" left="62%" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))
+        : displayedData.map((exploreItem) => (
         <div
           key={exploreItem.id} // Use unique key for each item
           className="d-item col-lg-3 col-md-6 col-sm-6 col-xs-12"
