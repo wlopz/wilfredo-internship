@@ -1,82 +1,119 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import AuthorImage from "../../images/author_thumbnail.jpg";
-import nftImage from "../../images/nftImage.jpg";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 
 const ExploreItems = () => {
-  const [exploreItems, setExploreItems] = useState([]);
+  // State to hold filtered items from the API
   const [exploreItemsFilter, setExploreItemsFilter] = useState([]);
 
-  // Fetch items from API
-  const fetchExploreItems = async () => {
-    const { data } = await axios.get("https://us-central1-nft-cloud-functions.cloudfunctions.net/explore");
-    setExploreItems(data);
-    setExploreItemsFilter(data); // Initialize filter with all items
+  // State for currently displayed data, controlling what is visible in the UI
+  const [displayedData, setDisplayedData] = useState([]);
+
+  // State to track how many items are currently visible in the grid
+  const [visibleItemCount, setVisibleItemCount] = useState(8);
+
+  // Get search params from URL and navigation helper
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  // Function to fetch filtered items from the external API using axios
+  const fetchFilteredItems = async (filter = "") => {
+    // Fetch filtered items based on the filter from the API
+    const { data } = await axios.get(
+      `https://us-central1-nft-cloud-functions.cloudfunctions.net/explore?filter=${filter}`
+    );
+
+    // Save the filtered items in state
+    setExploreItemsFilter(data);
+
+    // Set the initially displayed data (first 8 items)
+    setDisplayedData(data.slice(0, visibleItemCount));
   };
 
+  // On mount, check if there’s a filter value in the URL and apply it
   useEffect(() => {
-    fetchExploreItems();
-  }, []);
+    const filter = searchParams.get("filter") || "";
+    fetchFilteredItems(filter);
+  }, [searchParams]);
 
-  // Countdown calculation
+  // Function to handle filtering of explore items based on user selection
+  // Handle filter change
+  const handleFilterChange = (value) => {
+    // Update the URL with the new filter value
+    if (value === "price_low_to_high" || value === "price_high_to_low" || value === "likes_high_to_low") {
+      navigate(`?filter=${value}`, { replace: true });
+    } else if (value === "") {
+      navigate(``, { replace: false });
+    }
+    
+
+    // Fetch the new filtered data from the API
+    fetchFilteredItems(value);
+  };
+
+  // Function to calculate the remaining time until the NFT expires
   const calculateCountdown = (expiryDate) => {
-    const expiry = new Date(expiryDate).getTime();
+    const expiry = new Date(expiryDate).getTime(); // Convert expiry date string to a timestamp
 
+    // Inner function to calculate the difference between now and the expiry date
     const updateCountdown = () => {
-      const now = new Date().getTime();
-      const timeRemaining = expiry - now;
-
+      const now = new Date().getTime(); // Current time in milliseconds
+      const timeRemaining = expiry - now; // Time difference
+      
+      // Check if the item is still active (not expired)
       if (timeRemaining > 0) {
+        // Calculate hours, minutes, and seconds remaining
         const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+        
+        // Return the formatted countdown string
         return `${hours}h ${minutes}m ${seconds}s`;
       } else {
-        return "Expired";
+        return "Expired"; // If time has passed, return "Expired"
       }
     };
-
-    return updateCountdown();
+    
+    return updateCountdown(); // Return the calculated countdown on function call
   };
 
-  // Countdown component
+  // React component to display the countdown timer for each NFT item
   const Countdown = ({ expiryDate }) => {
+    // State to hold the countdown timer value
     const [countdown, setCountdown] = useState(calculateCountdown(expiryDate));
 
+    // useEffect to update the countdown every second
     useEffect(() => {
+      // Create an interval that updates the countdown every second (1000 ms)
       const interval = setInterval(() => {
-        setCountdown(calculateCountdown(expiryDate));
+        setCountdown(calculateCountdown(expiryDate)); // Update countdown
       }, 1000);
-
+      
+      // Clean up the interval when the component unmounts
       return () => clearInterval(interval);
-    }, [expiryDate]);
+    }, [expiryDate]); // Dependency on expiryDate ensures recalculation when date changes
 
+    // Render the countdown value inside a styled div
     return <div className="de_countdown">{countdown}</div>;
   };
 
-  // Filter items by selected value
-  const filterExploreItems = (value) => {
-    let sortedItems = [...exploreItems]; // Make a copy of the original array to avoid mutating state
-
-    if (value === "price_low_to_high") {
-      sortedItems.sort((a, b) => a.price - b.price);
-    } else if (value === "price_high_to_low") {
-      sortedItems.sort((a, b) => b.price - a.price);
-    } else if (value === "likes_high_to_low") {
-      sortedItems.sort((a, b) => b.likes - a.likes);
-    }
-
-    setExploreItemsFilter(sortedItems); // Update the filtered state with sorted items
+  // Function to load more items (increases visible item count by 4)
+  const handleLoadMore = () => {
+    setVisibleItemCount((prevCount) => {
+      const newCount = prevCount + 4; // Increase the number of visible items by 4
+      setDisplayedData(exploreItemsFilter.slice(0, newCount)); // Update displayed items based on the new count
+      return newCount; // Return the updated count
+    });
   };
 
   return (
     <>
+      {/* Dropdown filter to select sorting criterion */}
       <div>
         <select
           id="filter-items"
-          defaultValue=""
-          onChange={(e) => filterExploreItems(e.target.value)} // Moved onChange to the select
+          defaultValue={searchParams.get("filter") || ""}
+          onChange={(e) => handleFilterChange(e.target.value)} // Call filter function when the value changes
         >
           <option value="">Default</option>
           <option value="price_low_to_high">Price, Low to High</option>
@@ -84,9 +121,11 @@ const ExploreItems = () => {
           <option value="likes_high_to_low">Most liked</option>
         </select>
       </div>
-      {exploreItemsFilter.map((exploreItem) => (
+
+      {/* Render the list of displayed data */}
+      {displayedData.map((exploreItem) => (
         <div
-          key={exploreItem.id}
+          key={exploreItem.id} // Use unique key for each item
           className="d-item col-lg-3 col-md-6 col-sm-6 col-xs-12"
           style={{ display: "block", backgroundSize: "cover" }}
         >
@@ -97,10 +136,13 @@ const ExploreItems = () => {
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
               >
+                {/* Display author image */}
                 <img className="lazy" src={exploreItem.authorImage} alt="" />
-                <i className="fa fa-check"></i>
+                <i className="fa fa-check"></i> {/* Check icon */}
               </Link>
             </div>
+
+            {/* Countdown timer for item expiry */}
             <Countdown expiryDate={exploreItem.expiryDate} />
 
             <div className="nft__item_wrap">
@@ -109,6 +151,7 @@ const ExploreItems = () => {
                   <button>Buy Now</button>
                   <div className="nft__item_share">
                     <h4>Share</h4>
+                    {/* Social media share buttons */}
                     <a href="" target="_blank" rel="noreferrer">
                       <i className="fa fa-facebook fa-lg"></i>
                     </a>
@@ -121,6 +164,8 @@ const ExploreItems = () => {
                   </div>
                 </div>
               </div>
+
+              {/* NFT item preview */}
               <Link to="/item-details">
                 <img
                   src={exploreItem.nftImage}
@@ -129,6 +174,8 @@ const ExploreItems = () => {
                 />
               </Link>
             </div>
+
+            {/* NFT item details */}
             <div className="nft__item_info">
               <Link to="/item-details">
                 <h4>{exploreItem.title}</h4>
@@ -142,11 +189,17 @@ const ExploreItems = () => {
           </div>
         </div>
       ))}
-      <div className="col-md-12 text-center">
-        <Link to="" id="loadmore" className="btn-main lead">
-          Load more
-        </Link>
-      </div>
+
+      {/* "Load More" button to show additional items */}
+      {/* Disappear load more when there are no more items */}
+      {exploreItemsFilter.length > displayedData.length && (
+        <div className="col-md-12 text-center">
+          <Link to="" id="loadmore" className="btn-main lead" onClick={handleLoadMore}>
+            Load more
+          </Link>
+        </div>
+      )}
+      
     </>
   );
 };
