@@ -52,7 +52,7 @@ const TopSellers = () => {
               : topSellers.sort((a, b) => b.price - a.price).map((seller) => (
                 <li key={seller.index}>
                   <div className="author_list_pp">
-                    <Link to="/author">
+                    <Link to={`/author/${seller.authorId}`}>
                       <img
                         className="lazy pp-author"
                         src={seller.authorImage}
@@ -62,7 +62,7 @@ const TopSellers = () => {
                     </Link>
                   </div>
                   <div className="author_list_info">
-                    <Link to="/author">
+                    <Link to={`/author/${seller.authorId}`}>
                       {seller.authorName}
                     </Link>
                     <span>{seller.price} ETH</span>

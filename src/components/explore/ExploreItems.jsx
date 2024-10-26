@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Skeleton from "../UI/Skeleton";
 
@@ -18,6 +18,7 @@ const ExploreItems = () => {
 
   // Get search params from URL and navigation helper
   const [searchParams] = useSearchParams();
+
   const navigate = useNavigate();
 
   // Function to fetch filtered items from the external API using axios
@@ -54,7 +55,6 @@ const ExploreItems = () => {
       setLoading(true);
       navigate(``, { replace: false });
     }
-    
 
     // Fetch the new filtered data from the API
     fetchFilteredItems(value);
@@ -134,29 +134,29 @@ const ExploreItems = () => {
       {/* Render the list of displayed data */}
       {loading
         ? new Array(8).fill(0).map((_, index) => (
-            <div className="col-lg-3 col-md-6 col-sm-12 col-xs-12" key={index}>
-              <div className="nft__item">
-                <div className="author_list_pp">
-                  <Skeleton width="60px" height="60px" borderRadius="50px" />
-                </div>
-                <div className="de_countdown" style={{ right: 6, border: "none" }}>
-                  <Skeleton width="80px" height="20px" borderRadius="5px" />
-                </div>
+          <div className="col-lg-3 col-md-6 col-sm-12 col-xs-12" key={index}>
+            <div className="nft__item">
+              <div className="author_list_pp">
+                <Skeleton width="60px" height="60px" borderRadius="50px" />
+              </div>
+              <div className="de_countdown" style={{ right: 6, border: "none" }}>
+                <Skeleton width="80px" height="20px" borderRadius="5px" />
+              </div>
 
-                <div className="nft__item_wrap">
-                  <Skeleton width="200px" height="250px" borderRadius="5px" top="28px" />
-                </div>
+              <div className="nft__item_wrap">
+                <Skeleton width="200px" height="250px" borderRadius="5px" top="28px" />
+              </div>
 
-                <div className="nft__item_info">
-                  <Skeleton width="80px" height="20px" borderRadius="5px" />
-                  <div>
-                    <Skeleton width="45px" height="20px" borderRadius="5px" />
-                    <Skeleton width="33px" height="20px" borderRadius="5px" left="62%" />
-                  </div>
+              <div className="nft__item_info">
+                <Skeleton width="80px" height="20px" borderRadius="5px" />
+                <div>
+                  <Skeleton width="45px" height="20px" borderRadius="5px" />
+                  <Skeleton width="33px" height="20px" borderRadius="5px" left="62%" />
                 </div>
               </div>
             </div>
-          ))
+          </div>
+        ))
         : displayedData.map((exploreItem) => (
         <div
           key={exploreItem.id} // Use unique key for each item
@@ -166,7 +166,7 @@ const ExploreItems = () => {
           <div className="nft__item">
             <div className="author_list_pp">
               <Link
-                to="/author"
+                to={`/author/${exploreItem.authorId}`}
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
               >
