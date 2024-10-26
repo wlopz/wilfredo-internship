@@ -118,7 +118,11 @@ const ExploreItems = () => {
   return (
     <>
       {/* Dropdown filter to select sorting criterion */}
-      <div>
+      <div
+        data-aos="fade-in" 
+        data-aos-duration="800"
+        data-aos-easing="ease-in-out"
+      >
         <select
           id="filter-items"
           defaultValue={searchParams.get("filter") || ""}
@@ -162,6 +166,9 @@ const ExploreItems = () => {
           key={exploreItem.id} // Use unique key for each item
           className="d-item col-lg-3 col-md-6 col-sm-6 col-xs-12"
           style={{ display: "block", backgroundSize: "cover" }}
+          data-aos="fade-in" 
+          data-aos-duration="800"
+          data-aos-easing="ease-in-out"
         >
           <div className="nft__item">
             <div className="author_list_pp">
