@@ -6,6 +6,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { PreviousArrow, NextArrow } from "../../components/UI/CustomArrowsCarousel";
 import Skeleton from "../UI/Skeleton";
+import Countdown from "../UI/Countdown";
 
 const NewItems = () => {
   const [newItems, setNewItems] = useState([]);
@@ -37,48 +38,6 @@ const NewItems = () => {
       { breakpoint: 768, settings: { slidesToShow: 2, slidesToScroll: 1 } },
       { breakpoint: 480, settings: { slidesToShow: 1, slidesToScroll: 1 } },
     ],
-  };
-
-  // Convert expiryDate into a countdown format
-  const calculateCountdown = (expiryDate) => {
-    const expiry = new Date(expiryDate).getTime();
-
-    const updateCountdown = () => {
-      const now = new Date().getTime();
-      const timeRemaining = expiry - now;
-
-      if (timeRemaining > 0) {
-        
-        const hours = Math.floor(
-          (timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-        );
-        const minutes = Math.floor(
-          (timeRemaining % (1000 * 60 * 60)) / (1000 * 60)
-        );
-        const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
-
-        return `${hours}h ${minutes}m ${seconds}s`;
-      } else {
-        return "Expired";
-      }
-    };
-
-    return updateCountdown();
-  };
-
-  // Component to update countdown every second
-  const Countdown = ({ expiryDate }) => {
-    const [countdown, setCountdown] = useState(calculateCountdown(expiryDate));
-
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setCountdown(calculateCountdown(expiryDate));
-      }, 1000);
-
-      return () => clearInterval(interval);
-    }, [expiryDate]);
-
-    return <div className="de_countdown">{countdown}</div>;
   };
 
   return (
