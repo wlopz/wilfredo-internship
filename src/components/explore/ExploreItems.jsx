@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Skeleton from "../UI/Skeleton";
+import Countdown from "../UI/Countdown";
 
 const ExploreItems = () => {
   // State to track whether the API data is being fetched
@@ -58,52 +59,6 @@ const ExploreItems = () => {
 
     // Fetch the new filtered data from the API
     fetchFilteredItems(value);
-  };
-
-  // Function to calculate the remaining time until the NFT expires
-  const calculateCountdown = (expiryDate) => {
-    const expiry = new Date(expiryDate).getTime(); // Convert expiry date string to a timestamp
-
-    // Inner function to calculate the difference between now and the expiry date
-    const updateCountdown = () => {
-      const now = new Date().getTime(); // Current time in milliseconds
-      const timeRemaining = expiry - now; // Time difference
-      
-      // Check if the item is still active (not expired)
-      if (timeRemaining > 0) {
-        // Calculate hours, minutes, and seconds remaining
-        const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
-        
-        // Return the formatted countdown string
-        return `${hours}h ${minutes}m ${seconds}s`;
-      } else {
-        return "Expired"; // If time has passed, return "Expired"
-      }
-    };
-    
-    return updateCountdown(); // Return the calculated countdown on function call
-  };
-
-  // React component to display the countdown timer for each NFT item
-  const Countdown = ({ expiryDate }) => {
-    // State to hold the countdown timer value
-    const [countdown, setCountdown] = useState(calculateCountdown(expiryDate));
-
-    // useEffect to update the countdown every second
-    useEffect(() => {
-      // Create an interval that updates the countdown every second (1000 ms)
-      const interval = setInterval(() => {
-        setCountdown(calculateCountdown(expiryDate)); // Update countdown
-      }, 1000);
-      
-      // Clean up the interval when the component unmounts
-      return () => clearInterval(interval);
-    }, [expiryDate]); // Dependency on expiryDate ensures recalculation when date changes
-
-    // Render the countdown value inside a styled div
-    return <div className="de_countdown">{countdown}</div>;
   };
 
   // Function to load more items (increases visible item count by 4)
